@@ -14,7 +14,7 @@ RUN apk add --no-cache ca-certificates gettext unzip \
     && chmod +x /usr/local/bin/helm \
     && chmod +x /usr/local/bin/aws-iam-authenticator \
     && wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip \
-    && unzip awscliv2.zip && ./aws/install 
+    && unzip awscli-exe-linux-x86_64.zip && ./aws/install 
 
 USER kubernetes
 
