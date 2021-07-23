@@ -7,12 +7,14 @@ ARG HELM_VERSION=3.6.1
 ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
 
 RUN adduser -D -u 10000 kubernetes
-RUN apk add --no-cache ca-certificates gettext \
+RUN apk add --no-cache ca-certificates gettext unzip \
     && wget -q https://storage.googleapis.com/kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl \
     && wget -q https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm \
-    && chmod +x /usr/local/bin/aws-iam-authenticator
+    && chmod +x /usr/local/bin/aws-iam-authenticator \
+    && wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
+    && unzip awscliv2.zip && ./aws/install 
 
 USER kubernetes
 
