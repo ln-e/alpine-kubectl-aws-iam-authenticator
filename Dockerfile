@@ -13,7 +13,7 @@ RUN apk add --no-cache ca-certificates gettext unzip \
     && wget -q https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm \
     && chmod +x /usr/local/bin/aws-iam-authenticator \
-    && wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
+    && wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip \
     && unzip awscliv2.zip && ./aws/install 
 
 USER kubernetes
