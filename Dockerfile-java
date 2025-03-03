@@ -1,0 +1,41 @@
+FROM bellsoft/liberica-runtime-container:jdk-21-glibc
+
+# Use environment variables for easier maintenance
+ENV KUBECTL_VERSION="v1.30.1"
+ENV HELM_VERSION="3.14.2"
+ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_amd64"
+
+ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
+
+# Create user
+#RUN adduser -D -u 10000 kubernetes
+
+# Install required packages and tools
+RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
+    # Install kubectl
+    curl -LO "https://cdn.dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/ && \
+    # Install Helm
+    curl -LO "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
+    tar -zxvf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    mv linux-amd64/helm /usr/local/bin/helm && \
+    rm -rf linux-amd64 helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    # Install AWS IAM Authenticator
+    chmod +x /usr/local/bin/aws-iam-authenticator && \
+    # Install AWS CLI
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf aws awscliv2.zip
+
+# Switch to non-root user
+#USER kubernetes
+#WORKDIR /home/kubernetes
+
+# Verify installations
+RUN kubectl version --client && \
+    helm version --short && \
+    aws --version
+
+CMD ["kubectl", "version", "--client"]
