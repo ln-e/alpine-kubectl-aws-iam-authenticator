@@ -8,7 +8,7 @@ ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authen
 ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
 
 # Create user
-#RUN adduser -D -u 10000 kubernetes
+RUN adduser -D -u 10000 kubernetes
 
 # Install required packages and tools
 RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
@@ -30,8 +30,8 @@ RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
     rm -rf aws awscliv2.zip
 
 # Switch to non-root user
-#USER kubernetes
-#WORKDIR /home/kubernetes
+USER kubernetes
+WORKDIR /home/kubernetes
 
 # Verify installations
 RUN kubectl version --client && \

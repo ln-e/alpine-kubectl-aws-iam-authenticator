@@ -1,9 +1,11 @@
 FROM frolvlad/alpine-glibc:alpine-3.14
 
 # Use environment variables for easier maintenance
-ENV KUBECTL_VERSION=$(wget -qO- https://dl.k8s.io/release/stable.txt)
+ENV KUBECTL_VERSION="v1.30.1"
 ENV HELM_VERSION="3.14.2"
 ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_amd64"
+
+ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
 
 # Create user
 RUN adduser -D -u 10000 kubernetes
@@ -20,9 +22,7 @@ RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
     mv linux-amd64/helm /usr/local/bin/helm && \
     rm -rf linux-amd64 helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
     # Install AWS IAM Authenticator
-    curl -LO "${AWS_IAM_AUTHENTICATOR_URL}" && \
-    chmod +x aws-iam-authenticator && \
-    mv aws-iam-authenticator /usr/local/bin/ && \
+    chmod +x /usr/local/bin/aws-iam-authenticator && \
     # Install AWS CLI
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
