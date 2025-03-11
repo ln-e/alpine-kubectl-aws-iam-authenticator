@@ -30,6 +30,7 @@ jobs:
         with:
           context: .
           file: Dockerfile-alpine
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:latest
@@ -42,6 +43,7 @@ jobs:
         with:
           context: .
           file: Dockerfile-java
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:java-latest
