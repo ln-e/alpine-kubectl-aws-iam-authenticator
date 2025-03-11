@@ -23,7 +23,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       
       - name: Login to DockerHub
-        if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
+        if: ${{ github.event_name != 'pull_request' && (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -36,8 +36,7 @@ jobs:
           file: Dockerfile-alpine
 #          platforms: linux/amd64,linux/arm64 # base image "frolvlad/alpine-glibc:alpine-3.14" does not support arm64
           platforms: linux/amd64
-          push: |
-            ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN ? 'true' : 'false' }}
+          push: ${{ github.event_name != 'pull_request' && (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:alpine-${{ github.sha }}
