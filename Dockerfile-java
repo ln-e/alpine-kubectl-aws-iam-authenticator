@@ -1,9 +1,11 @@
 FROM bellsoft/liberica-runtime-container:jdk-21-glibc
 
+ARG TARGETARCH
+
 # Use environment variables for easier maintenance
 ENV KUBECTL_VERSION="v1.29.1"
 ENV HELM_VERSION="3.14.2"
-ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_amd64"
+ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_${TARGETARCH}"
 
 ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
 
@@ -13,18 +15,24 @@ RUN adduser -D -u 1000 kubernetes
 # Install required packages and tools
 RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
     # Install kubectl
-    curl -LO "https://cdn.dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    curl -LO "https://cdn.dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" && \
     chmod +x kubectl && \
     mv kubectl /usr/local/bin/ && \
     # Install Helm
-    curl -LO "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
-    tar -zxvf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
-    mv linux-amd64/helm /usr/local/bin/helm && \
-    rm -rf linux-amd64 helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    curl -LO "https://get.helm.sh/helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" && \
+    tar -zxvf helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz && \
+    mv linux-${TARGETARCH}/helm /usr/local/bin/helm && \
+    rm -rf linux-${TARGETARCH} helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz && \
     # Install AWS IAM Authenticator
     chmod +x /usr/local/bin/aws-iam-authenticator && \
     # Install AWS CLI
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    if [ "$TARGETARCH" = "amd64" ]; then \
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" && exit 1; \
+    fi && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm -rf aws awscliv2.zip
