@@ -1,4 +1,4 @@
-FROM frolvlad/alpine-glibc:alpine-3.14
+FROM oowy/glibc:2.39-alpine3.19
 
 ARG TARGETARCH
 
