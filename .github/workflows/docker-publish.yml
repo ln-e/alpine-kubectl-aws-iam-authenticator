@@ -37,10 +37,10 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:alpine-${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:buildcache,mode=max
+            ${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:latest
+            ${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:alpine-${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:buildcache,mode=max
 
       - name: Build and push java
         uses: docker/build-push-action@v5
@@ -50,7 +50,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:java-latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:java-${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/kubectl-helm-iam-authenticator:buildcache,mode=max
+            ${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:java-latest
+            ${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:java-${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME || '_' }}/kubectl-helm-iam-authenticator:buildcache,mode=max
