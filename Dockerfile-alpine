@@ -7,6 +7,8 @@ ENV KUBECTL_VERSION="v1.29.1"
 ENV HELM_VERSION="3.14.2"
 ENV AWS_IAM_AUTHENTICATOR_URL="https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_${TARGETARCH}"
 
+ARG TARGETARCH
+
 ADD ${AWS_IAM_AUTHENTICATOR_URL} /usr/local/bin/aws-iam-authenticator
 
 # Create user
@@ -25,16 +27,16 @@ RUN apk add --no-cache ca-certificates gettext unzip git openssh curl bash && \
     rm -rf linux-${TARGETARCH} helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz && \
     # Install AWS IAM Authenticator
     chmod +x /usr/local/bin/aws-iam-authenticator && \
-    # Install AWS CLI \
-    if [ "$TARGETARCH" = "amd64" ]; then \
-      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-      curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
-    else \
-        echo "Unsupported architecture: $TARGETARCH" && exit 1; \
-    fi && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
+    # Install AWS CLI
+    set -eux; \
+    case "${TARGETARCH}" in \
+      amd64)   AWSCLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" ;; \
+      arm64)   AWSCLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" ;; \
+      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    curl -sSL "${AWSCLI_URL}" -o awscliv2.zip; \
+    unzip -q awscliv2.zip; \
+    ./aws/install; \
     rm -rf aws awscliv2.zip
 
 # Switch to non-root user
